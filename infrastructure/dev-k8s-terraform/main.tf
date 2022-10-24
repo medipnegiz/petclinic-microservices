@@ -91,7 +91,6 @@ resource "aws_security_group" "petclinic-kube-master-sg" {
     from_port = 6443
     to_port = 6443
     cidr_blocks = ["0.0.0.0/0"]
-    #security_groups = [aws_security_group.petclinic-mutual-sg.id]
   }
   ingress {
     protocol = "tcp"
@@ -119,15 +118,15 @@ resource "aws_security_group" "petclinic-kube-master-sg" {
   }
   ingress {
     protocol = "tcp"
-    from_port = 10251
-    to_port = 10251
-    security_groups = [aws_security_group.petclinic-mutual-sg.id]
+    from_port = 10257
+    to_port = 10257
+    self = true
   }
   ingress {
     protocol = "tcp"
-    from_port = 10252
-    to_port = 10252
-    security_groups = [aws_security_group.petclinic-mutual-sg.id]
+    from_port = 10259
+    to_port = 10259
+    self = true
   }
   ingress {
     protocol = "tcp"
@@ -168,12 +167,13 @@ resource "aws_instance" "kube-master" {
         Id = "1"
         environment = "dev"
     }
+
 }
 
 resource "aws_instance" "worker-1" {
     ami = "ami-013f17f36f8b1fefb"
     instance_type = "t3a.medium"
-        iam_instance_profile = module.iam.worker_profile_name
+    iam_instance_profile = module.iam.worker_profile_name
     vpc_security_group_ids = [aws_security_group.petclinic-kube-worker-sg.id, aws_security_group.petclinic-mutual-sg.id]
     key_name = "clarus"
     subnet_id = "subnet-04b4cb38979d49bb7"  # select own subnet_id of us-east-1a
